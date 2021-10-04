@@ -5,7 +5,7 @@ from django.db import migrations
 
 def set_owner_pure_phone(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
-    for flat in Flat.objects.all():
+    for flat in Flat.objects.all().iterator():
         phone_number = phonenumbers.parse(flat.owners_phonenumber, 'RU')
         if phonenumbers.is_valid_number(phone_number):
             pure_number = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
@@ -15,9 +15,7 @@ def set_owner_pure_phone(apps, schema_editor):
 
 def move_backward(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
-    for flat in Flat.objects.all():
-        flat.owner_pure_phone = None
-        flat.save()
+    Flat.objects.all().update(owner_pure_phone=None)
 
 
 class Migration(migrations.Migration):
